@@ -2,14 +2,12 @@
 #include <time.h>
 #include <stdbool.h>
 
-void tarefa_cpu_bound(long limite) {
-    printf("Iniciando tarefa CPU-bound (Buscando numeros primos ate %ld)...\n", limite);
+void encontrar_primos(long limite) {
     
-    // Inicia a medição do tempo de CPU
     clock_t inicio = clock();
     long total_primos = 0;
     
-    // Laço intensivo: A CPU vai executar bilhões de instruções matemáticas aqui
+
     for (long num = 2; num < limite; num++) {
         bool eh_primo = true;
         for (long i = 2; i * i <= num; i++) {
@@ -23,7 +21,7 @@ void tarefa_cpu_bound(long limite) {
         }
     }
     
-    // Finaliza a medição do tempo de CPU
+
     clock_t fim = clock();
     double tempo_gasto = (double)(fim - inicio) / CLOCKS_PER_SEC;
     
@@ -32,7 +30,7 @@ void tarefa_cpu_bound(long limite) {
 }
 
 int main() {
-    // Como o C é extremamente rápido, usamos 10 milhões para ocupar a CPU
-    tarefa_cpu_bound(10000000);
+
+    encontrar_primos(10000000);
     return 0;
 }
