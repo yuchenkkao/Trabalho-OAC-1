@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void tarefa_memory_bound(long tamanho) {
+    printf("Iniciando tarefa Memory-bound (Matriz %ldx%ld)...\n", tamanho, tamanho);
+    
+    // Inicia a medição do tempo de CPU
+    clock_t inicio = clock();
+
+    // 1. Alocação massiva na memória Heap
+    printf("Alocando memoria RAM...\n");
+    // Alocamos como vetores unidimensionais contíguos para representar 2D
+    int *matriz = (int *)malloc(tamanho * tamanho * sizeof(int));
+    int *transposta = (int *)malloc(tamanho * tamanho * sizeof(int));
+
+    if (matriz == NULL || transposta == NULL) {
+        printf("Erro: Memoria RAM insuficiente para a alocacao.\n");
+        return;
+    }
+
+    // 2. Escrita sequencial massiva (Amigável para a Cache)
+    printf("Preenchendo a matriz original...\n");
+    for (long i = 0; i < tamanho * tamanho; i++) {
+        matriz[i] = i % 100;
+    }
+
+    // 3. Leitura com saltos massiva (Gerador de Cache Misses)
+    printf("Transpondo a matriz na memoria...\n");
+    for (long i = 0; i < tamanho; i++) {
+        for (long j = 0; j < tamanho; j++) {
+            // A matriz original é lida com "saltos", forçando a CPU a 
+            // buscar constantemente novos blocos de dados na RAM.
+            transposta[i * tamanho + j] = matriz[j * tamanho + i];
+        }
+    }
+
+    // Finaliza a medição do tempo de CPU
+    clock_t fim = clock();
+    double tempo_gasto = (double)(fim - inicio) / CLOCKS_PER_SEC;
+
+    printf("Concluido em %.4f segundos de tempo de CPU.\n", tempo_gasto);
+    
+    // 4. Liberação da memória
+    free(matriz);
+    free(transposta);
+    printf("Memoria liberada.\n");
+}
+
+int main() {
+    // Matriz de 15000x15000 inteiros = 225 milhões de ints por matriz.
+    // Usando int de 4 bytes, são 900MB por matriz (1.8GB no total).
+    // Diminua este valor se o seu computador tiver pouca memória livre.
+    tarefa_memory_bound(15000);
+    return 0;
+}
